@@ -1,0 +1,281 @@
+﻿@model IslaamAdmin.Models.User
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+        <div class="row" id="dataSection">
+            <div class="col-md-8 col-sm-10 col-xs-12">
+                <div class="row no-gutters">
+                    <div class="col-sm-3">
+                        <h1>Users</h1>
+                    </div>
+
+                    <div class="offset-sm-6 col-sm-3">
+                        <button type="button" class="btn btn-primary btn-action" id="addNewUser" >
+                            Add New User
+                        </button>
+                    </div>
+                </div>
+                <hr />
+                <div class="row no-gutters">
+                    <div class="col-sm-offset-2 col-sm-12">
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>UserName</th>
+                                    <th>Password</th>
+                                    <th>Edit</th>
+                                    <th>Delete</th>
+                                </tr>
+                            </thead>
+                            <tbody data-bind="foreach:users()">
+                                <tr>
+                                    <td data-bind="text:Name"></td>
+                                    <td data-bind="text:Username"></td>
+                                    <td data-bind="text:Password"></td>
+                                    <td><a href="#" id="editUser" data-bind="click: function(){Edit();}"><i class="fa fa-edit"></i></a></td>
+                                    <td><a href="#" id="deleteUser" data-bind="click: function(){Delete();}"><i class="fa fa-trash"></i></a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="row" id="addNewUserFormDiv">
+                    @using (Html.BeginForm("AddUser", "Account", FormMethod.Post, new { @class = "form-group", @id = "addForm" }))
+                    {
+                        <h1>Add New User</h1>
+                        <div class="row">
+                            <div class="col-md-3 offset-1">
+                                <div class="form-group input-group">
+                                    <label class="has-float-label">
+                                        @*<input type="text" data-bind="value: Name" id="addName" maxlength="50" class="form-control" placeholder="Name"/>*@
+                                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", @id = "Name", placeholder = Html.DisplayNameFor(m => m.Name), data_bind = "value: Name" })
+                                        @Html.LabelFor(m => m.Name)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 offset-1">
+                                <div class="form-group input-group">
+                                    <label class="has-float-label">
+                                        @*<input type="text" data-bind="value: Name" id="addName" maxlength="50" class="form-control" placeholder="Name"/>*@
+                                        @Html.TextBoxFor(m => m.Username, new { @class = "form-control", @id = "Username", placeholder = Html.DisplayNameFor(m => m.Name), data_bind = "value: Username" })
+                                        @Html.LabelFor(m => m.Username)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 offset-1">
+                                <div class="form-group input-group">
+                                    <label class="has-float-label">
+                                        @*<input type="text" data-bind="value: Name" id="addName" maxlength="50" class="form-control" placeholder="Name"/>*@
+                                        @Html.TextBoxFor(m => m.Password, new { @class = "form-control", @id = "Name", placeholder = Html.DisplayNameFor(m => m.Password), data_bind = "value: Password" })
+                                        @Html.LabelFor(m => m.Password)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 offset-1">
+                                @*@Html.Submit("Submit")*@
+                                <input type="submit" class="btn btn-action" value="Submit" id="submitAddUser" data-bind="click: function(){AddUser();}" />
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="row" id="editUserFormDiv" data-bind="with:EditModel">
+                    @using (Html.BeginForm("EditUser", "Account", FormMethod.Post, new { @class = "form-group", @id = "editForm" }))
+                    {
+                        <h1>Edit User</h1>
+                        <input type="hidden" data-bind="value:Id" id="editId" />
+                        <div class="row">
+                            <div class="col-md-3 offset-1">
+                                <div class="form-group input-group">
+                                    <label class="has-float-label">
+                                        <input type="text" data-bind="value: Name" id="editName" maxlength="50" class="form-control" />
+                                        @Html.LabelFor(m => m.Name)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 offset-1">
+                                <div class="form-group input-group">
+                                    <label class="has-float-label">
+                                        <input type="text" data-bind="value: Username" id="editUsername" maxlength="50" class="form-control" />
+                                        @Html.LabelFor(m => m.Username)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 offset-1">
+                                <div class="form-group input-group">
+                                    <label class="has-float-label">
+                                        <input type="text" data-bind="value: Password" id="editPassword" maxlength="50" class="form-control" />
+                                        @Html.LabelFor(m => m.Password)
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 offset-1">
+                                @*@Html.Submit("Submit")*@
+                                <input type="submit" class="btn btn-action" value="Submit" id="submitEditUser" data-bind="click: function(){$root.EditUser();}" />
+                            </div>
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+}
+else
+{
+@Html.PartialAsync("_NotLoggedIn")
+}
+
+<script type="text/javascript">
+    $(function () {
+        $('#addNewUser').click(function () {
+            $('#addNewUserFormDiv').show();
+        });
+    });
+
+    $(function () {
+        $('#editUser').click(function () {
+            $('#editUserFormDiv').show();
+        });
+    });
+
+
+    var userModel = function (parent,id, name, username,password) {
+        var self = this;
+        self.Id = ko.observable(id);
+        self.Name = ko.observable(name);
+        self.Username = ko.observable(username);
+        self.Password = ko.observable(password);
+        self.EditModel = ko.observable();
+
+        self.Edit = function () {
+            $('#editUserFormDiv').show();
+            parent.EditModel(self);
+        }
+
+        self.Delete = function () {
+            var url = "/Account/DeleteUser?Id=" + self.Id();
+            var result = confirm('Are you sure you want to delete this ?');
+            if (result) {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: {},
+                    contentType: 'application/json; charset=utf-8',
+                    success: function (response) {
+                        if (response.success) {
+                            parent.GetUsers();
+                            alert("Deleted Successfully !");
+                            //toastr.success('Deleted Successfully !');
+                        } else {
+                            //toastr.error('Deletion did not work !');
+                            alert("Deletion did not work !");
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    var userViewModel = function () {
+        var self = this;
+        self.Id = ko.observable();
+        self.Name = ko.observable();
+        self.Username = ko.observable();
+        self.Password = ko.observable();
+        self.users = ko.observableArray([]);
+        self.EditModel = ko.observable();
+
+        self.GetUsers = function () {
+            $.ajax({
+                url: '@Url.Action("GetUsers","Account")',
+                type: 'POST',
+                contentType: 'application/json;charset=utf-8',
+                data: {},
+                success: function (response) {
+                    self.users.removeAll();
+                    for (var i = 0; i < response.length; i++) {
+                        self.users.push(new userModel(self, response[i].Id, response[i].Name, response[i].Username, response[i].Password));
+                    }
+                    console.log(self.Name);
+                }
+            });
+        }
+
+        self.AddUser = function () {
+           var rData = {
+               Name: self.Name(),
+               Username: self.Username(),
+               Password: self.Password()
+           }
+            var user = JSON.stringify(rData);
+            $.ajax({
+                url: '@Url.Action("AddUser","Account")',
+                type: 'POST',
+                data: user,
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'JSON',
+                success: function (response) {
+                    $('#addForm').hide();
+                    if (response.success == true) {
+                        self.GetUsers();
+                        alert("Added Successfully");
+                        //toastr.success("The Service was successfully added.");
+                    } else {
+                        alert("Not Added")
+                        //toastr.error("The Service was not added.");
+                    }
+                    $('#addNewUser').on("click", function () {
+                        $('#addForm')[0].reset();
+                        $('#addForm').show();
+                    })
+
+                }
+            });
+        }
+
+        self.EditUser = function () {
+            self.Id = $('#editId').val();
+            self.Name = $('#editName').val();
+            self.Username = $('#editUsername').val();
+            self.Password = $('#editPassword').val();
+            $.ajax({
+                url: '@Url.Action("EditUser","Account")',
+                type: 'POST',
+                data: JSON.stringify(self),
+                contentType: 'application/json; charset=utf-8',
+                dataType: 'JSON',
+                success: function (response) {
+                    if (response.success) {
+                        self.GetUsers();
+                        $('#editForm').hide();
+                        alert("Edit Worked");
+                        //toastr.success('The service was edited successfully.');
+                    } else {
+                        alert("Edit did not work");
+                        //toastr.error('The service was not edited.');
+                    }
+                }
+            });
+        }
+        self.init = function () {
+            self.GetUsers();
+        }
+        self.init();
+    }
+
+    $(document).ready(function () {
+        $('#addNewUserFormDiv').hide();
+        $('#editUserFormDiv').hide();
+
+        var viewModel = new userViewModel();
+        ko.applyBindings(viewModel, document.getElementById('dataSection'));
+    });
+
+</script>

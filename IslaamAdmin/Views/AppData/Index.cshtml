@@ -1,0 +1,88 @@
+﻿@model IslaamAdmin.Models.User
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/6.4.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.4.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.4.0/firebase-database.js"></script>
+    <script src="~/firebase/firebase.js"></script>
+
+    <div class="row" id="dataSection">
+        <div class="col-md-8 col-sm-10 col-xs-12">
+            <div class="row no-gutters">
+                <div class="col-sm-3">
+                    <h1>Questions</h1>
+                </div>
+            </div>
+            <hr />
+            <div class="row no-gutters">
+                <div class="col-sm-offset-2 col-sm-12">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Question</th>
+                                <th>Answer</th>
+                                <th>Correct Answer</th>
+                                <th>Incorrect Answer</th>
+                            </tr>
+                        </thead>
+                        <tbody data-bind="foreach:data()">
+                            <tr>
+                                <td data-bind="text:Question"></td>
+                                <td data-bind="text:Answer"></td>
+                                <td><a href="#" id="editUser" data-bind="click: function(){Edit();}"><i class="fa fa-thumbs-up"></i></a></td>
+                                <td><a href="#" id="deleteUser" data-bind="click: function(){Delete();}"><i class="fa fa-thumbs-down"></i></a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var dataModel = function (parent, question,answer) {
+            var self = this;
+            self.Question = ko.observable(question);
+            self.Answer = ko.observable(answer);
+         
+        }
+
+        var dataVM = function () {
+            var self = this;
+            self.Question = ko.observable();
+            self.Answer = ko.observable();
+            self.data = ko.observableArray([]);
+
+            firebase.database().ref("/QAData").on('value',
+                function (snapshot) {
+                    snapshot.forEach(
+                        function (child) {
+                            child.forEach(
+                                function (smallerChild) {
+                                    var item = smallerChild.node_.value_;
+                                    item = item.substring(1, item.length - 2);
+                                    var splitItem = item.split(':');
+                                    var question = splitItem[0].replace(/['"]+/g, '');
+                                    var answer = splitItem[1].replace(/['"]+/g, '');
+                                    self.data.push(new dataModel(self, question, answer));
+                                });
+                        });
+                });
+        }
+
+        $(document).ready(function () {
+
+            var viewModel = new dataVM();
+            ko.applyBindings(viewModel, document.getElementById('dataSection'));
+        });
+
+      
+    </script>
+
+
+}

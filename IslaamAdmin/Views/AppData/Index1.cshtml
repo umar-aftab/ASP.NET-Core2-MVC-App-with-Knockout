@@ -1,0 +1,72 @@
+﻿@model IslaamAdmin.Models.User
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+    <!-- The core Firebase JS SDK is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/6.4.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.4.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.4.0/firebase-database.js"></script>
+    <script src="~/firebase/firebase.js"></script>
+
+    <div class="row" id="dataSection">
+        <div class="col-md-8 col-sm-10 col-xs-12">
+            <div class="row no-gutters">
+                <div class="col-sm-3">
+                    <h1>Questions</h1>
+                </div>
+            </div>
+            <hr />
+            <div class="row no-gutters">
+                <div class="col-sm-offset-2 col-sm-12">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>Asked Questions</th>
+                                <th>Correct Answer</th>
+                                <th>Incorrect Answer</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="data"></td>
+                                <td><a href="#" id="editUser" data-bind="click: function(){Edit();}"><i class="fa fa-thumbs-up"></i></a></td>
+                                <td><a href="#" id="deleteUser" data-bind="click: function(){Delete();}"><i class="fa fa-thumbs-down"></i></a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function () {
+            if (!console) {
+                console = {};
+            }
+            var old = console.log;
+            var logger = document.getElementById('data');
+            console.log = function (message) {
+                if (typeof message == 'object') {
+                    logger.innerHTML += (JSON && JSON.stringify ? JSON.stringify(message) : String(message)) + '<br />';
+                } else {
+                    logger.innerHTML += message + '<br />';
+                }
+            }
+        })();
+    </script>
+    <script>
+        firebase.database().ref("/QAData").on('value',
+            function (snapshot) {
+                snapshot.forEach(
+                    function (child) {
+                        child.forEach(
+                            function (smallerChild) {
+                                console.log(smallerChild.node_.value_);
+                            });
+                    });
+            });
+    </script>
+}
